@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.ufc-black {
+  background: linear-gradient(to right, #000000, #d4af37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.dark .ufc-black {
+  background: linear-gradient(to right, #ffffff, #d4af37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 45 55% 52%; /* Gold */
+    --primary-foreground: 0 0% 0%; /* Black */
+    --secondary: 0 0% 0%; /* Black */
+    --secondary-foreground: 45 55% 52%; /* Gold */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 45 55% 92%; /* Light gold */
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 45 55% 52%; /* Gold */
+    --radius: 0.5rem;
+
+    /* Chart colors */
+    --chart-1: 45 55% 52%; /* Gold */
+    --chart-2: 45 55% 32%; /* Darker gold */
+    --chart-3: 0 0% 0%; /* Black */
+    --chart-4: 0 0% 20%; /* Dark gray */
+    --chart-5: 0 0% 40%; /* Medium gray */
+
+    --fighter-blue: 45 55% 52%; /* Gold */
+    --fighter-red: 0 0% 0%; /* Black */
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 45 55% 82%; /* Light gold */
+    --card: 0 0% 10%;
+    --card-foreground: 45 55% 82%; /* Light gold */
+    --popover: 0 0% 10%;
+    --popover-foreground: 45 55% 82%; /* Light gold */
+    --primary: 45 55% 52%; /* Gold */
+    --primary-foreground: 0 0% 10%; /* Very dark gray instead of black */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 45 55% 82%; /* Light gold */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 45 55% 22%; /* Dark gold */
+    --accent-foreground: 45 55% 82%; /* Light gold */
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 45 55% 82%; /* Light gold */
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 45 55% 52%; /* Gold */
+
+    /* Chart colors in dark mode */
+    --chart-1: 45 55% 62%; /* Brighter gold */
+    --chart-2: 45 55% 42%; /* Gold */
+    --chart-3: 0 0% 100%; /* White */
+    --chart-4: 0 0% 80%; /* Light gray */
+    --chart-5: 0 0% 60%; /* Medium gray */
+
+    --fighter-blue: 45 55% 62%; /* Brighter gold */
+    --fighter-red: 0 0% 100%; /* White */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
