@@ -1,26 +1,24 @@
-# PredictBet Project Brief
+# Project Brief
 
-## Project Overview
-PredictBet is a web application designed to provide fight prediction and analysis tools for combat sports. The platform combines statistical analysis, fighter profiles, and sentiment analysis to help users make informed betting decisions.
+## Project Name
+PredictBet
 
-## Core Requirements
-- Fighter profile analysis and comparison tools
-- Predictive modeling for fight outcomes
-- Sentiment analysis of social media feeds
-- Interactive data visualization
-- Enhanced search capabilities
-- Real-time dashboard
+## Core Purpose
+PredictBet is a Next.js application designed to provide UFC fans with predictive insights, stats, sentiment analysis, and other tools to enhance their experience.
 
-## Project Goals
-1. Provide accurate fight outcome predictions
-2. Deliver comprehensive fighter analysis tools
-3. Enable data-driven betting decisions
-4. Create an intuitive and responsive user interface
-5. Integrate social sentiment with traditional statistics
+## Goals
+1. Deliver a seamless user experience with modern web technologies.
+2. Provide accurate and engaging data visualization tools.
+3. Enable users to explore UFC fighter profiles and compare stats.
+4. Integrate social feeds and sentiment analysis for community engagement.
 
-## Technical Stack
-- Next.js with TypeScript
-- Tailwind CSS for styling
-- Component-based architecture
-- Data visualization tools
-- Real-time updates
+## Scope
+The project focuses on building a web application with the following features:
+- Data visualization tools.
+- Enhanced search capabilities.
+- Sentiment analysis charts.
+- Fighter profiles and comparison tools.
+- Social feed integration.
+
+## Target Audience
+UFC fans and enthusiasts looking for predictive insights and tools to enhance their understanding of fights and fighters.

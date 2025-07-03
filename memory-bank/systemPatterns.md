@@ -1,117 +1,25 @@
 # System Patterns
 
-## Architecture Overview
-PredictBet follows a modern web application architecture with:
-- Next.js for server-side rendering and routing
-- Component-based UI structure
-- TypeScript for type safety
-- Tailwind CSS for styling
+## System Architecture
+PredictBet is built using a modular architecture with the following key components:
+1. **Next.js Framework**: Provides server-side rendering and static site generation for optimal performance.
+2. **TypeScript**: Ensures type safety and improves code maintainability.
+3. **Tailwind CSS**: Enables rapid UI development with utility-first styling.
+4. **Radix UI Components**: Offers accessible and reusable UI elements.
+
+## Key Technical Decisions
+- **Framework Choice**: Next.js was chosen for its performance benefits and developer-friendly features.
+- **Styling**: Tailwind CSS was selected for its flexibility and ease of use.
+- **UI Components**: Radix UI components were integrated to ensure accessibility and consistency.
+- **TypeScript**: Adopted to reduce runtime errors and improve developer productivity.
 
 ## Design Patterns
-
-### Component Structure
-```
-components/
-├── ui/           # Reusable UI components
-├── features/     # Feature-specific components
-└── layout/       # Layout components
-```
-
-### Component Patterns
-1. Presentational Components
-   - Pure UI rendering
-   - Prop-based configuration
-   - Tailwind styling
-
-2. Container Components
-   - Business logic
-   - Data fetching
-   - State management
-
-3. Custom Hooks
-   - Reusable logic
-   - State management
-   - Event handling
-
-### Data Flow
-```mermaid
-graph TD
-    A[API Layer] --> B[Data Services]
-    B --> C[State Management]
-    C --> D[UI Components]
-    D --> E[User Interaction]
-    E --> A
-```
-
-## Technical Decisions
-
-### UI Framework
-- Next.js chosen for:
-  - Server-side rendering
-  - TypeScript support
-  - Performance optimization
-  - Route handling
-
-### Styling
-- Tailwind CSS for:
-  - Utility-first approach
-  - Responsive design
-  - Component consistency
-  - Easy customization
-
-### Component Library
-- Custom UI components for:
-  - Design consistency
-  - Reusability
-  - Maintainability
-  - Performance
-
-### Data Visualization
-- Custom chart components for:
-  - Fighter statistics
-  - Performance metrics
-  - Trend analysis
-  - Comparison data
+1. **Component-Based Design**: The application is structured around reusable and modular components.
+2. **State Management**: Local state is managed using React hooks, with potential for global state management if needed.
+3. **Responsive Design**: Ensures the application is accessible on various devices and screen sizes.
 
 ## Component Relationships
-
-### Feature Components
-1. Fighter Profiles
-   - Data visualization
-   - Statistics display
-   - Historical records
-
-2. Comparison Tool
-   - Head-to-head stats
-   - Visual comparisons
-   - Data analysis
-
-3. Predictor
-   - Data processing
-   - Probability calculation
-   - Result display
-
-4. Social Feed
-   - Real-time updates
-   - Sentiment analysis
-   - Trend tracking
-
-### Shared Components
-1. UI Elements
-   - Buttons
-   - Cards
-   - Forms
-   - Charts
-
-2. Layout Components
-   - Navigation
-   - Sidebar
-   - Headers
-   - Footers
-
-## Performance Considerations
-- Component lazy loading
-- Image optimization
-- Data caching
-- Server-side rendering
-- API request optimization
+- **UI Components**: Located in `components/ui/`, these are reusable building blocks for the application.
+- **Feature Components**: Found in `components/`, these implement specific features like data visualization and search.
+- **Pages**: Defined in the `app/` directory, these represent the main routes of the application.
+- **Utilities**: Utility functions and configurations are stored in the `lib/` directory.
