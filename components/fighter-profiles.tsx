@@ -1,40 +1,154 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { mockFights, mockFighterProfiles } from "@/lib/mock-data"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { mockFights } from "@/lib/mock-data"
+import { fighterDataService, ProcessedFighterData } from "@/lib/services/fighter-data"
+
+interface FighterOption {
+  id: string
+  name: string
+  opponent: string
+  fightDate: string
+}
 
 export default function FighterProfiles() {
-  const [selectedFighterId, setSelectedFighterId] = useState("fighter1")
+  const [selectedFighterId, setSelectedFighterId] = useState<string>("")
+  const [fighters, setFighters] = useState<ProcessedFighterData[]>([])
+  const [selectedFighter, setSelectedFighter] = useState<ProcessedFighterData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Get all fighters from the fights data
-  const fighters = mockFights.reduce(
-    (acc, fight) => {
-      if (!acc.some((f) => f.id === `fighter-${fight.id}-A`)) {
-        acc.push({
-          id: `fighter-${fight.id}-A`,
-          name: fight.fighterA,
+  // Generate fighter options from mock fights and real data
+  const generateFighterOptions = (fightersData: ProcessedFighterData[]): FighterOption[] => {
+    const options: FighterOption[] = []
+    
+    mockFights.forEach(fight => {
+      const fighterA = fightersData.find(f => f.name === fight.fighterA)
+      const fighterB = fightersData.find(f => f.name === fight.fighterB)
+      
+      if (fighterA) {
+        options.push({
+          id: fighterA.id,
+          name: fighterA.name,
           opponent: fight.fighterB,
-          fightDate: fight.date,
+          fightDate: fight.date
         })
       }
-      if (!acc.some((f) => f.id === `fighter-${fight.id}-B`)) {
-        acc.push({
-          id: `fighter-${fight.id}-B`,
-          name: fight.fighterB,
+      
+      if (fighterB) {
+        options.push({
+          id: fighterB.id,
+          name: fighterB.name,
           opponent: fight.fighterA,
-          fightDate: fight.date,
+          fightDate: fight.date
         })
       }
-      return acc
-    },
-    [] as { id: string; name: string; opponent: string; fightDate: string }[],
-  )
+    })
+    
+    return options
+  }
 
-  const selectedFighter = mockFighterProfiles[selectedFighterId] || mockFighterProfiles.fighter1
+  useEffect(() => {
+    const loadFighters = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        const fightersData = await fighterDataService.getAllFighters()
+        setFighters(fightersData)
+        
+        // Set the first fighter as selected by default
+        if (fightersData.length > 0) {
+          setSelectedFighterId(fightersData[0].id)
+          setSelectedFighter(fightersData[0])
+        }
+      } catch (err) {
+        setError('Failed to load fighter data. Please try again later.')
+        console.error('Error loading fighters:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadFighters()
+  }, [])
+
+  useEffect(() => {
+    if (selectedFighterId && fighters.length > 0) {
+      const fighter = fighters.find(f => f.id === selectedFighterId)
+      setSelectedFighter(fighter || null)
+    }
+  }, [selectedFighterId, fighters])
+
+  const fighterOptions = generateFighterOptions(fighters)
+
+  if (loading) {
+    return (
+      <div className="grid gap-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Fighter Profiles</h1>
+        </div>
+        <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-20" />
+              <Skeleton className="h-4 w-32" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {[1, 2, 3, 4].map(i => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-32 w-full" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="grid gap-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Fighter Profiles</h1>
+        </div>
+        <Alert>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  if (!selectedFighter) {
+    return (
+      <div className="grid gap-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Fighter Profiles</h1>
+        </div>
+        <Alert>
+          <AlertDescription>No fighter data available.</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   return (
     <div className="grid gap-6">
@@ -51,17 +165,15 @@ export default function FighterProfiles() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="space-y-1 p-2">
-                {fighters.map((fighter) => (
+                {fighterOptions.map((fighter) => (
                   <button
                     key={fighter.id}
                     className={`w-full flex items-center gap-2 p-2 rounded-md text-left ${
-                      selectedFighterId === fighter.id.replace("fighter-", "").replace("-A", "").replace("-B", "")
+                      selectedFighterId === fighter.id
                         ? "bg-primary/10 font-medium"
                         : "hover:bg-muted"
                     }`}
-                    onClick={() =>
-                      setSelectedFighterId(fighter.id.replace("fighter-", "").replace("-A", "").replace("-B", ""))
-                    }
+                    onClick={() => setSelectedFighterId(fighter.id)}
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback>
@@ -90,7 +202,9 @@ export default function FighterProfiles() {
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-2xl">{selectedFighter.name}</CardTitle>
-                  <CardDescription>{selectedFighter.nickname}</CardDescription>
+                  {selectedFighter.nickname && (
+                    <CardDescription>"{selectedFighter.nickname}"</CardDescription>
+                  )}
                 </div>
                 <Avatar className="h-16 w-16 bg-gradient-to-r from-fighter-blue to-fighter-red">
                   <AvatarFallback className="text-xl text-white">
@@ -107,10 +221,12 @@ export default function FighterProfiles() {
                 <div>
                   <h3 className="font-medium mb-2">Fighter Info</h3>
                   <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Age:</span>
-                      <span>{selectedFighter.age}</span>
-                    </div>
+                    {selectedFighter.age > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Age:</span>
+                        <span>{selectedFighter.age}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Height:</span>
                       <span>{selectedFighter.height}</span>
@@ -138,11 +254,11 @@ export default function FighterProfiles() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Wins:</span>
-                      <span>{selectedFighter.record.wins}</span>
+                      <span className="text-sentiment-positive">{selectedFighter.record.wins}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Losses:</span>
-                      <span>{selectedFighter.record.losses}</span>
+                      <span className="text-sentiment-negative">{selectedFighter.record.losses}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Draws:</span>
