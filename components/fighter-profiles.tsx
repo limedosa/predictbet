@@ -7,52 +7,18 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { mockFights } from "@/lib/mock-data"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 import { fighterDataService, ProcessedFighterData } from "@/lib/services/fighter-data"
-
-interface FighterOption {
-  id: string
-  name: string
-  opponent: string
-  fightDate: string
-}
 
 export default function FighterProfiles() {
   const [selectedFighterId, setSelectedFighterId] = useState<string>("")
   const [fighters, setFighters] = useState<ProcessedFighterData[]>([])
+  const [filteredFighters, setFilteredFighters] = useState<ProcessedFighterData[]>([])
   const [selectedFighter, setSelectedFighter] = useState<ProcessedFighterData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Generate fighter options from mock fights and real data
-  const generateFighterOptions = (fightersData: ProcessedFighterData[]): FighterOption[] => {
-    const options: FighterOption[] = []
-    
-    mockFights.forEach(fight => {
-      const fighterA = fightersData.find(f => f.name === fight.fighterA)
-      const fighterB = fightersData.find(f => f.name === fight.fighterB)
-      
-      if (fighterA) {
-        options.push({
-          id: fighterA.id,
-          name: fighterA.name,
-          opponent: fight.fighterB,
-          fightDate: fight.date
-        })
-      }
-      
-      if (fighterB) {
-        options.push({
-          id: fighterB.id,
-          name: fighterB.name,
-          opponent: fight.fighterA,
-          fightDate: fight.date
-        })
-      }
-    })
-    
-    return options
-  }
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     const loadFighters = async () => {
@@ -60,8 +26,10 @@ export default function FighterProfiles() {
         setLoading(true)
         setError(null)
         
+        // Load ALL fighters from the CSV data
         const fightersData = await fighterDataService.getAllFighters()
         setFighters(fightersData)
+        setFilteredFighters(fightersData)
         
         // Set the first fighter as selected by default
         if (fightersData.length > 0) {
@@ -86,7 +54,17 @@ export default function FighterProfiles() {
     }
   }, [selectedFighterId, fighters])
 
-  const fighterOptions = generateFighterOptions(fighters)
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredFighters(fighters)
+    } else {
+      const filtered = fighters.filter(fighter =>
+        fighter.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (fighter.nickname && fighter.nickname.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+      setFilteredFighters(filtered)
+    }
+  }, [searchQuery, fighters])
 
   if (loading) {
     return (
@@ -94,7 +72,7 @@ export default function FighterProfiles() {
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">Fighter Profiles</h1>
         </div>
-        <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+        <div className="grid gap-6 md:grid-cols-[320px_1fr]">
           <Card>
             <CardHeader>
               <Skeleton className="h-6 w-20" />
@@ -102,7 +80,7 @@ export default function FighterProfiles() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {[1, 2, 3, 4].map(i => (
+                {[1, 2, 3, 4, 5, 6].map(i => (
                   <Skeleton key={i} className="h-12 w-full" />
                 ))}
               </div>
@@ -154,43 +132,70 @@ export default function FighterProfiles() {
     <div className="grid gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Fighter Profiles</h1>
+        <div className="text-sm text-muted-foreground">
+          {filteredFighters.length} of {fighters.length} fighters
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+      <div className="grid gap-6 md:grid-cols-[320px_1fr]">
         <div className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Fighters</CardTitle>
-              <CardDescription>Select a fighter to view their profile</CardDescription>
+              <CardDescription>Search and select a fighter to view their profile</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="space-y-1 p-2">
-                {fighterOptions.map((fighter) => (
-                  <button
-                    key={fighter.id}
-                    className={`w-full flex items-center gap-2 p-2 rounded-md text-left ${
-                      selectedFighterId === fighter.id
-                        ? "bg-primary/10 font-medium"
-                        : "hover:bg-muted"
-                    }`}
-                    onClick={() => setSelectedFighterId(fighter.id)}
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        {fighter.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div>{fighter.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        vs {fighter.opponent} • {fighter.fightDate}
-                      </div>
+              <div className="p-4 border-b">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search fighters..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div className="max-h-[600px] overflow-y-auto">
+                <div className="space-y-1 p-2">
+                  {filteredFighters.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground">
+                      No fighters found matching "{searchQuery}"
                     </div>
-                  </button>
-                ))}
+                  ) : (
+                    filteredFighters.map((fighter) => (
+                      <button
+                        key={fighter.id}
+                        className={`w-full flex items-center gap-2 p-2 rounded-md text-left transition-colors ${
+                          selectedFighterId === fighter.id
+                            ? "bg-primary/10 font-medium border border-primary/20"
+                            : "hover:bg-muted"
+                        }`}
+                        onClick={() => setSelectedFighterId(fighter.id)}
+                      >
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            {fighter.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate">{fighter.name}</div>
+                          {fighter.nickname && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              "{fighter.nickname}"
+                            </div>
+                          )}
+                          <div className="text-xs text-muted-foreground">
+                            {fighter.weight} • {fighter.stance}
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -203,7 +208,7 @@ export default function FighterProfiles() {
                 <div>
                   <CardTitle className="text-2xl">{selectedFighter.name}</CardTitle>
                   {selectedFighter.nickname && (
-                    <CardDescription>"{selectedFighter.nickname}"</CardDescription>
+                    <CardDescription className="text-base">"{selectedFighter.nickname}"</CardDescription>
                   )}
                 </div>
                 <Avatar className="h-16 w-16 bg-gradient-to-r from-fighter-blue to-fighter-red">
@@ -362,6 +367,27 @@ export default function FighterProfiles() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Additional Info</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm text-muted-foreground">
+                <div className="flex justify-between mb-1">
+                  <span>UFC Stats Profile:</span>
+                  <a 
+                    href={selectedFighter.profileUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    View Official Stats
+                  </a>
+                </div>
               </div>
             </CardContent>
           </Card>
